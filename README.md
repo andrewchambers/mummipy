@@ -2,8 +2,8 @@
 
 Preserve your requirements forever!
 
-bundles a loosely specified python requirements.txt into a tarball.
-The entombed requirements  with everything bundled with pip hashes.
+Bundles a loosely specified python requirements.txt into a tarball.
+The entombed requirements have everything you need for offline reproducible builds.
 
 # Mummipy file format
 
