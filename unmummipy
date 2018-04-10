@@ -21,7 +21,7 @@ done
 
 if test $help = true
 then
-	echo "$0 -r requirements.mummipy -o venv"
+	echo "$0 [-lhv] -r requirements.mummipy -o venv"
 	exit 1
 fi
 

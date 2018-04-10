@@ -46,7 +46,7 @@ PyYAML==3.12  --hash=sha256:592766c6303207a20efc445587778322d7f73b161bd994f227ad
 
 - Does not use binary packages.
 - Does not support windows.
-- Only supports python3
+- Only supports python3.
 
 # Benefits
 
