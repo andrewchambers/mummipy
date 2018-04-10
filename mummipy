@@ -1,0 +1,63 @@
+#! /usr/bin/env bash
+
+set -e
+set -u
+
+verbose=false
+help=false
+requirements=./requirements.txt
+output=./requirements.mummipy
+
+while getopts "vhr:o:" o; do
+  case "${o}" in
+    v ) verbose=true ;;
+    h ) help=true ;;
+    r ) requirements=${OPTARG} ;;
+    o ) output=${OPTARG} ;;
+    *) break ;;
+  esac
+done
+
+if test $help = true
+then
+	echo "$0 [-hv] -r requirements.txt -o requirements.mummipy"
+	exit 1
+fi
+
+if test $verbose = true
+then
+	set -x
+fi
+
+tempdir=$(mktemp -d)
+cleanup () {
+   rm -rf "$tempdir"
+}
+trap cleanup EXIT
+
+output=$(realpath $output)
+requirements=$(realpath $requirements)
+
+cd $tempdir
+python3 -m venv $tempdir/venv
+export PATH=$tempdir/venv/bin:$PATH
+
+export HOME=$tempdir/fakehome
+mkdir $HOME
+
+mkdir $tempdir/mummipy
+mkdir $tempdir/mummipy/tomb
+pip install --no-binary :all: -r $requirements
+pip freeze > $tempdir/requirements_no_hash.txt
+pip download --no-binary :all: -r $tempdir/requirements_no_hash.txt -d $tempdir/mummipy/tomb
+echo "" > $tempdir/mummipy/requirements.txt
+for pkg in `cat $tempdir/requirements_no_hash.txt`
+do
+	echo -n $pkg " " >> $tempdir/mummipy/requirements.txt
+	tarball_name=$(echo $pkg | sed 's/==/-/g').tar.gz
+	pip hash $tempdir/mummipy/tomb/$tarball_name | tail -n 1 >> $tempdir/mummipy/requirements.txt
+done
+
+
+cd $tempdir/mummipy
+tar czvf $output .

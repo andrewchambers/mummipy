@@ -1,0 +1,55 @@
+#! /usr/bin/env bash
+
+set -e
+set -u
+
+verbose=false
+help=false
+list=false
+requirements=./requirements.mummipy
+output=./venv
+while getopts "lvhr:o:" o; do
+  case "${o}" in
+    v ) verbose=true ;;
+    h ) help=true ;;
+    l ) list=true ;;
+    r ) requirements=${OPTARG}  ;;
+    o ) output=${OPTARG} ;;
+    *) break ;;
+  esac
+done
+
+if test $help = true
+then
+	echo "$0 -r requirements.mummipy -o venv"
+	exit 1
+fi
+
+if test $verbose = true
+then
+	set -x
+fi
+
+if test $list = true
+then
+  tar xzf $requirements ./requirements.txt -O
+  exit 0
+fi
+
+tempdir=$(mktemp -d)
+cleanup () {
+   rm -rf "$tempdir"
+}
+trap cleanup EXIT
+
+output=$(realpath $output)
+requirements=$(realpath $requirements)
+
+cd $tempdir
+mkdir mummipy
+cd mummipy
+tar xzvf $requirements
+
+python3 -m venv $output
+export PATH=$output/bin:$PATH
+pip install --no-deps --require-hashes -r $tempdir/mummipy/requirements.txt --no-index --find-links $tempdir/mummipy/tomb
