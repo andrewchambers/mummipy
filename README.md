@@ -50,4 +50,4 @@ PyYAML==3.12  --hash=sha256:592766c6303207a20efc445587778322d7f73b161bd994f227ad
 
 # Benefits
 
-- It exists, whoever wrote pip doesn't care about reproducable builds.
+- It exists, whoever wrote pip doesn't care about reproducible builds.
